@@ -28,6 +28,7 @@ Config = {
 	RapidFire         = false,
 	MultiBulletTP     = false,
 	NoSpread          = false,
+	TeamCheck         = true, -- Active ou désactive le filtre d'équipe universel
 	
 	-- ESP
 	ESPEnabled        = false,
@@ -90,10 +91,34 @@ local THEMES = {
 
 local COL = THEMES[Config.Theme]
 
+-- Fonction Team Check Universelle (Compatible Blox Strike & autres FPS)
+local function isEnemy(player)
+	if player == LocalPlayer then return false end
+	if not Config.TeamCheck then return true end
+	
+	-- 1. Vérification par l'objet Team officiel Roblox
+	if LocalPlayer.Team and player.Team then
+		if LocalPlayer.Team == player.Team then
+			return false
+		else
+			return true
+		end
+	end
+	
+	-- 2. Vérification par attributs ou valeurs courantes dans les FPS (Team, _Team, etc.)
+	local success, localTeam = pcall(function() return LocalPlayer.TeamColor or LocalPlayer:GetAttribute("Team") end)
+	local success2, targetTeam = pcall(function() return player.TeamColor or player:GetAttribute("Team") end)
+	if success and success2 and localTeam and targetTeam then
+		if localTeam == targetTeam then return false end
+	end
+	
+	return true
+end
+
 local function getTargets()
 	local out = {}
 	for _, p in ipairs(Players:GetPlayers()) do
-		if p ~= LocalPlayer and p.Character then
+		if isEnemy(p) and p.Character then
 			local char = p.Character
 			local hum = char:FindFirstChildOfClass("Humanoid")
 			local root = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
@@ -387,6 +412,7 @@ end
 local y1 = 36
 addCheckboxCustom(col1, "Aimbot Actif", "AimEnabled", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "Cercle FOV", "FOVRing", y1); y1 = y1 + 27
+addCheckboxCustom(col1, "Team Check (Anti-Team)", "TeamCheck", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "TriggerBot", "TriggerEnabled", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "Rapid Fire (Manuel)", "RapidFire", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "Multi-Target TP", "MultiBulletTP", y1); y1 = y1 + 27
