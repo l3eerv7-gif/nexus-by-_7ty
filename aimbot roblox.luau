@@ -91,25 +91,23 @@ local THEMES = {
 
 local COL = THEMES[Config.Theme]
 
--- Fonction Team Check Universelle (Compatible Blox Strike & autres FPS)
+-- Fonction Team Check Universelle corrigée (Compatible Blox Strike & autres FPS)
 local function isEnemy(player)
 	if player == LocalPlayer then return false end
 	if not Config.TeamCheck then return true end
 	
-	-- 1. Vérification par l'objet Team officiel Roblox
+	-- Si le jeu n'utilise pas de système d'équipe classique (Teams vides), on cible tout le monde
+	if #Players:GetTeams() == 0 then
+		return true
+	end
+	
+	-- Vérification par l'objet Team officiel Roblox
 	if LocalPlayer.Team and player.Team then
 		if LocalPlayer.Team == player.Team then
 			return false
 		else
 			return true
 		end
-	end
-	
-	-- 2. Vérification par attributs ou valeurs courantes dans les FPS (Team, _Team, etc.)
-	local success, localTeam = pcall(function() return LocalPlayer.TeamColor or LocalPlayer:GetAttribute("Team") end)
-	local success2, targetTeam = pcall(function() return player.TeamColor or player:GetAttribute("Team") end)
-	if success and success2 and localTeam and targetTeam then
-		if localTeam == targetTeam then return false end
 	end
 	
 	return true
