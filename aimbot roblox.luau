@@ -28,7 +28,7 @@ Config = {
 	RapidFire         = false,
 	MultiBulletTP     = false,
 	NoSpread          = false,
-	TeamCheck         = true, -- Active ou désactive le filtre d'équipe universel
+	TeamCheck         = false, -- Désactivé par défaut pour éviter de bloquer l'ESP
 	
 	-- ESP
 	ESPEnabled        = false,
@@ -91,23 +91,18 @@ local THEMES = {
 
 local COL = THEMES[Config.Theme]
 
--- Fonction Team Check Universelle corrigée (Compatible Blox Strike & autres FPS)
+-- Fonction Team Check robuste et flexible
 local function isEnemy(player)
 	if player == LocalPlayer then return false end
 	if not Config.TeamCheck then return true end
 	
-	-- Si le jeu n'utilise pas de système d'équipe classique (Teams vides), on cible tout le monde
+	-- Si le jeu n'utilise pas de service Teams natif
 	if #Players:GetTeams() == 0 then
 		return true
 	end
 	
-	-- Vérification par l'objet Team officiel Roblox
 	if LocalPlayer.Team and player.Team then
-		if LocalPlayer.Team == player.Team then
-			return false
-		else
-			return true
-		end
+		return LocalPlayer.Team ~= player.Team
 	end
 	
 	return true
@@ -410,7 +405,7 @@ end
 local y1 = 36
 addCheckboxCustom(col1, "Aimbot Actif", "AimEnabled", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "Cercle FOV", "FOVRing", y1); y1 = y1 + 27
-addCheckboxCustom(col1, "Team Check (Anti-Team)", "TeamCheck", y1); y1 = y1 + 27
+addCheckboxCustom(col1, "Team Check", "TeamCheck", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "TriggerBot", "TriggerEnabled", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "Rapid Fire (Manuel)", "RapidFire", y1); y1 = y1 + 27
 addCheckboxCustom(col1, "Multi-Target TP", "MultiBulletTP", y1); y1 = y1 + 27
